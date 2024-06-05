@@ -46,23 +46,23 @@ module.exports = defineConfig({
       },
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'],
-      screenshot:"on",
-      video:"on",
-      headless:false
-       },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'],
+    //   screenshot:"on",
+    //   video:"on",
+    //   headless:false
+    //    },
+    // },
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'],
-      screenshot:"on",
-      video:"on",
-      headless:false
-       },
-    },
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'],
+    //   screenshot:"on",
+    //   video:"on",
+    //   headless:false
+    //    },
+    // },
 
     /* Test against mobile viewports. */
     // {
