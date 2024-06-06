@@ -1,13 +1,14 @@
-import { test, expect } from '@playwright/test';
+import { test, expect ,chromium} from '@playwright/test';
 
 const URL = 'https://traqr-demo.weberon.org/?s=4UTG'
 
-test('checking for navlist items', async ({ page }) => {
+test('checking for navlist items', async ({page}) => {
+
   await page.goto(URL);
   
-  // checking if all the navlist items opens the correct URL
+  // Click the link and wait for the URL to be the expected one
   await page.getByRole('link', { name: 'Create Campaign' }).click();
-  await page.waitForTimeout(1000);
+  await page.waitForURL('https://traqr-demo.weberon.org/create_campaign?s=4UTG');
   const createCampaignURL  = await page.url()
   console.log("expected createCampaignURL - ","https://traqr-demo.weberon.org/create_campaign?s=4UTG")
   console.log("result createCampaignURL - ",createCampaignURL)
@@ -15,14 +16,14 @@ test('checking for navlist items', async ({ page }) => {
   
 
   await page.getByRole('link', { name: 'Upload Contacts' }).click();
-  await page.waitForTimeout(1000);
+  await page.waitForURL('https://traqr-demo.weberon.org/upload_records_in_bulk?s=4UTG');
   const uploadContactsURL  = await page.url()
   expect(uploadContactsURL).toBe('https://traqr-demo.weberon.org/upload_records_in_bulk?s=4UTG');
   console.log("expected uploadContactsURL - ","https://traqr-demo.weberon.org/upload_records_in_bulk?s=4UTG")
   console.log("result uploadContactsURL - ",uploadContactsURL)
 
   await page.getByRole('link', { name: 'Campaign Dashboard' }).click();
-  await page.waitForTimeout(1000);
+  await page.waitForURL('https://traqr-demo.weberon.org/see_statistics_for_short_url?s=4UTG');
   const campaignDashboardURL  = await page.url()
   expect(campaignDashboardURL).toBe('https://traqr-demo.weberon.org/see_statistics_for_short_url?s=4UTG');
   console.log("expected campaignDashboardURL - ","https://traqr-demo.weberon.org/see_statistics_for_short_url?s=4UTG")
@@ -30,7 +31,8 @@ test('checking for navlist items', async ({ page }) => {
 });
 
 // Give the campaign name from the existing campaign 
-test('submmiting the form for duplicate campaign name', async ({ page }) => {
+test('submmiting the form for duplicate campaign name', async ({page}) => {
+ 
   await page.goto(URL);
 
   await page.getByRole('link', { name: 'Create Campaign' }).click();
@@ -51,8 +53,8 @@ test('submmiting the form for duplicate campaign name', async ({ page }) => {
 
 
 // Give a unique campaign name here to test the application for unique campaign name
-test('submmiting the form for unique campaign name', async ({ page }) => {
-  const unique_campaign_name = "test4"
+test('submmiting the form for unique campaign name', async ({page}) => {
+  const unique_campaign_name = "test6"
   await page.goto(URL);
 
   await page.getByRole('link', { name: 'Create Campaign' }).click();
