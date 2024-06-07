@@ -54,7 +54,8 @@ test('submmiting the form for duplicate campaign name', async ({page}) => {
 
 // Give a unique campaign name here to test the application for unique campaign name
 test('submmiting the form for unique campaign name', async ({page}) => {
-  const unique_campaign_name = "test6"
+  const unique_campaign_name = "test11"
+  
   await page.goto(URL);
 
   await page.getByRole('link', { name: 'Create Campaign' }).click();

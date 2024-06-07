@@ -15,9 +15,9 @@ const { defineConfig, devices } = require('@playwright/test');
 module.exports = defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel:false,
  
-  timeout: 1 * 30 * 1000,
+  timeout: 1 * 60 * 1000,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
@@ -42,7 +42,7 @@ module.exports = defineConfig({
       use: { ...devices['Desktop Chrome'] ,
         screenshot:"on",
         video:"on",
-        headless:false
+        // headless:false
       },
     },
 

@@ -13,7 +13,12 @@ test('uploading csv file with all mandatory fields', async ({ page }) => {
   await page.getByRole('link', { name: 'Upload Contacts' }).click();
   await page.locator('[data-testid="stFileUploaderDropzoneInput"]').setInputFiles(filePath);
 
-  await page.waitForTimeout(8000);
+  // Wait for all the messages appears on screen 
+  await page.waitForFunction(() => {
+    const containers = document.querySelectorAll('div[data-testid="stMarkdownContainer"]');
+    return containers.length >= 18;
+  }, { timeout: 30000 });
+
   // checking for csv uplaod success message
  const CSVUploadMsg = await page.evaluate(() => {
   const containers = document.querySelectorAll('[data-testid="stMarkdownContainer"]');
@@ -36,8 +41,6 @@ const APIResponseMsg = await page.evaluate(() => {
   return null;
 });
 expect(APIResponseMsg).toBe(expectedAPIResponseMsg)
-
-
 
 const DownloadBtn = await page.getByTestId('stDownloadButton').getByTestId('baseButton-secondary')
 const DownloadBtnContent = await DownloadBtn.textContent()
@@ -64,8 +67,12 @@ test(`uploading csv file without mandatory field: ${field}`, async ({ page }) =>
 
   await page.getByRole('link', { name: 'Upload Contacts' }).click();
   await page.locator('[data-testid="stFileUploaderDropzoneInput"]').setInputFiles(filePath);
-  await page.waitForTimeout(8000);
-  await page.waitForSelector('[data-testid="stMarkdownContainer"]');
+
+// Wait for all the messages appears on screen
+  await page.waitForFunction(() => {
+    const containers = document.querySelectorAll('div[data-testid="stMarkdownContainer"]');
+    return containers.length >= 17;
+  }, { timeout: 30000 });
 
   // checking for csv uplaod success message
   const CSVUploadMsg = await page.evaluate(() => {
