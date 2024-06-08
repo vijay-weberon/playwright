@@ -54,7 +54,7 @@ test('submmiting the form for duplicate campaign name', async ({page}) => {
 
 // Give a unique campaign name here to test the application for unique campaign name
 test('submmiting the form for unique campaign name', async ({page}) => {
-  const unique_campaign_name = "test11"
+  const unique_campaign_name = "test13"
   
   await page.goto(URL);
 
@@ -74,4 +74,5 @@ test('submmiting the form for unique campaign name', async ({page}) => {
  expect(messageText).toBe(`A campaign for ${unique_campaign_name} was created successfully`)
  console.log("messageText ",messageText)
 })
+
 
