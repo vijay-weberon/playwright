@@ -45,6 +45,7 @@ expect(APIResponseMsg).toBe(expectedAPIResponseMsg)
 const DownloadBtn = await page.getByTestId('stDownloadButton').getByTestId('baseButton-secondary')
 const DownloadBtnContent = await DownloadBtn.textContent()
 expect(DownloadBtnContent).toBe(expectedDownloadBtnText)
+await page.getByTestId('stFullScreenFrame').nth(2).click();
 
 })
 
@@ -97,9 +98,11 @@ test(`uploading csv file without mandatory field: ${field}`, async ({ page }) =>
   expect(APIResponseMsg).toBe(expectedAPIResponseMsg)
   console.log("APIResponseMsg ",APIResponseMsg)
   console.log("expectedAPIResponseMsg ",expectedAPIResponseMsg)
+  await page.getByTestId('stNotification').nth(2).click();
 })
 })
 
+// Checking campaign dashboard for no resonse campaigns
 test('checking campaign which has no response', async ({page}) => {
   const expectedMsg = "No responses to this campaign yet"
   await page.goto(URL);

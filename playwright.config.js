@@ -42,7 +42,8 @@ module.exports = defineConfig({
       use: { ...devices['Desktop Chrome'] ,
         screenshot:"on",
         video:"on",
-        headless:false
+        headless:false,
+        trace:"on"
       },
     },
 

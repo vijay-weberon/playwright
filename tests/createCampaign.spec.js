@@ -54,7 +54,7 @@ test('submmiting the form for duplicate campaign name', async ({page}) => {
 
 // Give a unique campaign name here to test the application for unique campaign name
 test('submmiting the form for unique campaign name', async ({page}) => {
-  const unique_campaign_name = "test13"
+  const unique_campaign_name = "test14"
   
   await page.goto(URL);
 
@@ -74,5 +74,29 @@ test('submmiting the form for unique campaign name', async ({page}) => {
  expect(messageText).toBe(`A campaign for ${unique_campaign_name} was created successfully`)
  console.log("messageText ",messageText)
 })
+
+// checking for the reachpersona logo and the navbar collapse and expand functionality
+test('checking for the reachpersona logo and the navbar collapse and expand functionality', async ({page}) => {
+  await page.goto('https://traqr-demo.weberon.org/?s=4UTG');
+  await page.getByRole('img', { name: '0' }).click();
+  await page.getByText('© 2024 ReachPersona.com. All rights reserved.').click();
+  await page.screenshot({ path: 'playwright-report/data/screenshot0.png', fullPage: true });
+  await page.getByTestId('stSidebarContent').click();
+  await page.getByTestId('stSidebarContent').getByTestId('baseButton-header').click();
+  await page.screenshot({ path: 'playwright-report/data/screenshot1.png', fullPage: true });
+  await page.getByTestId('collapsedControl').getByTestId('baseButton-headerNoPadding').click();
+  await page.getByTestId('stSidebarContent').click();
+})
+
+// Checking for dropdown works if there are existing campaigns
+test('checking for dropdown works for already existing campaigns', async ({ page }) => {
+  await page.goto('https://traqr-demo.weberon.org/?s=4UTG');
+  
+  await page.getByRole('link', { name: 'Create Campaign' }).click();
+  await page.locator('summary').click();
+  await page.getByTestId('stExpanderDetails').getByTestId('stFullScreenFrame').click();
+});
+
+
 
 
