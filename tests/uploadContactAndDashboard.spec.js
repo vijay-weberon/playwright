@@ -20,32 +20,43 @@ test('uploading csv file with all mandatory fields', async ({ page }) => {
   }, { timeout: 30000 });
 
   // checking for csv uplaod success message
- const CSVUploadMsg = await page.evaluate(() => {
-  const containers = document.querySelectorAll('[data-testid="stMarkdownContainer"]');
-  if (containers.length >= 15) {
-    const pTag = containers[14].querySelector('p');
-    return pTag ? pTag.textContent : null;
-  }
-  return null;
-});
+  const CSVUploadMsg = await page.evaluate(() => {
+    const containers = document.querySelectorAll('[data-testid="stMarkdownContainer"]');
+    if (containers.length >= 15) {
+      const pTag = containers[14].querySelector('p');
+      return pTag ? pTag.textContent : null;
+    }
+    return null;
+  });
 expect(CSVUploadMsg).toBe(expectedCSVUploadMsg)
 
 
 // checking for API response sucess message
-const APIResponseMsg = await page.evaluate(() => {
-  const containers = document.querySelectorAll('[data-testid="stMarkdownContainer"]');
-  if (containers.length >= 15) {
-    const pTag = containers[16].querySelector('p');
-    return pTag ? pTag.textContent : null;
-  }
-  return null;
-});
-expect(APIResponseMsg).toBe(expectedAPIResponseMsg)
+  const APIResponseMsg = await page.evaluate(() => {
+    const containers = document.querySelectorAll('[data-testid="stMarkdownContainer"]');
+    if (containers.length >= 15) {
+      const pTag = containers[16].querySelector('p');
+      return pTag ? pTag.textContent : null;
+    }
+    return null;
+  });
+  expect(APIResponseMsg).toBe(expectedAPIResponseMsg)
 
-const DownloadBtn = await page.getByTestId('stDownloadButton').getByTestId('baseButton-secondary')
-const DownloadBtnContent = await DownloadBtn.textContent()
-expect(DownloadBtnContent).toBe(expectedDownloadBtnText)
-await page.getByTestId('stFullScreenFrame').nth(2).click();
+  const DownloadBtn = await page.getByTestId('stDownloadButton').getByTestId('baseButton-secondary')
+  const DownloadBtnContent = await DownloadBtn.textContent()
+  expect(DownloadBtnContent).toBe(expectedDownloadBtnText)
+  await page.getByTestId('stFullScreenFrame').nth(2).click();
+
+
+  // checking if the trackable links are generated in the response
+  
+// const textToCheck = 'https://api.webfluence.dev/YHuamjGt';
+const textToCheck = '404 Bridle Ct ';
+
+// Check if the text is present on the page
+const isVisible = await page.locator(`xpath=(//div[@id='portal'])[1]`)
+// Assert that the text is visible
+console.log(isVisible)
 
 })
 
@@ -125,6 +136,9 @@ test('checking campaign which has no response', async ({page}) => {
   });
   expect(responseMsg).toBe(expectedMsg)
 
+
+
+
   // Checking if Campaign Details and Responded Details are visible when any campaign is selected
   const expectedCampaignDetailsHeader = "Campaign Details"
   const CampaignDetailsHeader = await page.locator('span.st-emotion-cache-10trblm.e1nzilvr1').nth(2).textContent();
@@ -138,8 +152,20 @@ test('checking campaign which has no response', async ({page}) => {
 test('checking for campaign dashboard with responses', async ({ page }) => {
   await page.goto('https://traqr-demo.weberon.org/?s=4UTG');
   await page.getByRole('link', { name: 'Campaign Dashboard' }).click();
-  await page.frameLocator('iframe[title="st_aggrid\\.agGrid"]').getByRole('gridcell', { name: 'test-campaign-' }).click();
+  await page.frameLocator('iframe[title="st_aggrid\\.agGrid"]').getByRole('gridcell', { name: 'test-campaign-1' }).click();
+  await page.waitForTimeout(30000);
+  await page.locator('table'); // adjust the selector based on the actual table element
 
+  // Extract data from the table
+  const data2 = await page.evaluate(() => {
+    const rows = document.querySelectorAll('table tr');
+    return Array.from(rows, row => {
+      const columns = row.querySelectorAll('td, th');
+      return Array.from(columns, column => column.innerText);
+    });
+  });
+
+  console.log(data2);
   await page.frameLocator('iframe[title="st_aggrid\\.agGrid"] >> nth=1').getByRole('gridcell', { name: 'Abhishek' }).click();
 
   await page.frameLocator('iframe[title="st_aggrid\\.agGrid"] >> nth=2').getByRole('gridcell', { name: 'test-campaign-' }).first().click();
@@ -151,7 +177,20 @@ test('checking for campaign dashboard with responses', async ({ page }) => {
     expect(CampaignDetailsHeader).toBe(expectedCampaignDetailsHeader)
     console.log("expectedCampaignDetailsHeader",expectedCampaignDetailsHeader)
     console.log("CampaignDetailsHeader",CampaignDetailsHeader)
-  
+    await page.waitForTimeout(30000);
+  await page.locator('table'); // adjust the selector based on the actual table element
+
+  // Extract data from the table
+  const data1 = await page.evaluate(() => {
+    const rows = document.querySelectorAll('table tr');
+    return Array.from(rows, row => {
+      const columns = row.querySelectorAll('td, th');
+      return Array.from(columns, column => column.innerText);
+    });
+  });
+
+  console.log(data1);
+
     const expectedContactVisitsHeader = "Contact Visits"
     const ContactVisitsHeader = await page.locator('span.st-emotion-cache-10trblm.e1nzilvr1').nth(5).textContent();
     expect(ContactVisitsHeader).toBe(expectedContactVisitsHeader)
@@ -165,4 +204,21 @@ test('checking for campaign dashboard with responses', async ({ page }) => {
   expect(VisitDetailsHeader).toBe(expectedVisitDetailsHeader)
   console.log("expectedVisitDetailsHeader",expectedVisitDetailsHeader)
   console.log("VisitDetailsHeader",VisitDetailsHeader)
+ 
+ 
+ 
+ 
+  await page.waitForTimeout(30000);
+  await page.locator('table'); // adjust the selector based on the actual table element
+
+  // Extract data from the table
+  const data = await page.evaluate(() => {
+    const rows = document.querySelectorAll('table tr');
+    return Array.from(rows, row => {
+      const columns = row.querySelectorAll('td, th');
+      return Array.from(columns, column => column.innerText);
+    });
+  });
+
+  console.log(data);
 });
