@@ -2,45 +2,47 @@ import { test, expect } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
 import unzipper from 'unzipper';
-import csv from 'csv-parser';
+import csv from 'csv-parser'; 
 
 
-const URL = 'https://traqr-demo.weberon.org/?s=4UTG'
-
-const campaign_name = 'test-campaign-08'
+const traQRURL = 'https://traqr-demo.weberon.org/?s=4RHQ'
+const userID = '4RHQ'
+const campaign_name = 'test-campaign-01'
 
 const downloadDirectory = path.join(__dirname, '../downloads');
 let trackableUrl =""
+let Path = ""
+
 
 test('checking for navlist items', async ({page}) => {
-  await page.goto(URL);
+  await page.goto(traQRURL);
   
   // Click the link and wait for the URL to be the expected one
   await page.getByRole('link', { name: 'Create Campaign' }).click();
-  await page.waitForURL('https://traqr-demo.weberon.org/create_campaign?s=4UTG');
+  await page.waitForURL(`https://traqr-demo.weberon.org/create_campaign?s=${userID}`);
   const createCampaignURL  = await page.url()
-  console.log("expected createCampaignURL - ","https://traqr-demo.weberon.org/create_campaign?s=4UTG")
+  console.log("expected createCampaignURL - ",`https://traqr-demo.weberon.org/create_campaign?s=${userID}`)
   console.log("result createCampaignURL - ",createCampaignURL)
-  expect(createCampaignURL).toBe('https://traqr-demo.weberon.org/create_campaign?s=4UTG');
+  expect(createCampaignURL).toBe(`https://traqr-demo.weberon.org/create_campaign?s=${userID}`);
   
   await page.getByRole('link', { name: 'Upload Contacts' }).click();
-  await page.waitForURL('https://traqr-demo.weberon.org/upload_records_in_bulk?s=4UTG');
+  await page.waitForURL(`https://traqr-demo.weberon.org/upload_records_in_bulk?s=${userID}`);
   const uploadContactsURL  = await page.url()
-  expect(uploadContactsURL).toBe('https://traqr-demo.weberon.org/upload_records_in_bulk?s=4UTG');
-  console.log("expected uploadContactsURL - ","https://traqr-demo.weberon.org/upload_records_in_bulk?s=4UTG")
+  expect(uploadContactsURL).toBe(`https://traqr-demo.weberon.org/upload_records_in_bulk?s=${userID}`);
+  console.log("expected uploadContactsURL - ",`https://traqr-demo.weberon.org/upload_records_in_bulk?s=${userID}`)
   console.log("result uploadContactsURL - ",uploadContactsURL)
 
   await page.getByRole('link', { name: 'Campaign Dashboard' }).click();
-  await page.waitForURL('https://traqr-demo.weberon.org/see_statistics_for_short_url?s=4UTG');
+  await page.waitForURL(`https://traqr-demo.weberon.org/see_statistics_for_short_url?s=${userID}`);
   const campaignDashboardURL  = await page.url()
-  expect(campaignDashboardURL).toBe('https://traqr-demo.weberon.org/see_statistics_for_short_url?s=4UTG');
-  console.log("expected campaignDashboardURL - ","https://traqr-demo.weberon.org/see_statistics_for_short_url?s=4UTG")
+  expect(campaignDashboardURL).toBe(`https://traqr-demo.weberon.org/see_statistics_for_short_url?s=${userID}`);
+  console.log("expected campaignDashboardURL - ",`https://traqr-demo.weberon.org/see_statistics_for_short_url?s=${userID}`)
   console.log("result campaignDashboardURL - ",campaignDashboardURL)
 });
 
 
 test('submmiting the form for unique campaign name', async ({page}) => {
-  await page.goto(URL);
+  await page.goto(traQRURL);
   await page.getByRole('link', { name: 'Create Campaign' }).click();
   await page.getByLabel('Enter the name for the campaign').click();
   await page.getByLabel('Enter the name for the campaign').fill(campaign_name);
@@ -61,7 +63,7 @@ test('submmiting the form for unique campaign name', async ({page}) => {
 
 
 test('submmiting the form for duplicate campaign name', async ({page}) => {
-  await page.goto(URL);
+  await page.goto(traQRURL);
   await page.getByRole('link', { name: 'Create Campaign' }).click();
   await page.getByLabel('Enter the name for the campaign').click();
   await page.getByLabel('Enter the name for the campaign').fill(campaign_name);
@@ -81,7 +83,7 @@ test('submmiting the form for duplicate campaign name', async ({page}) => {
 
 
 test('checking for the reachpersona logo and the navbar collapse and expand functionality', async ({page}) => {
-  await page.goto(URL);
+  await page.goto(traQRURL);
   await page.getByRole('img', { name: '0' }).click();
   await page.getByText('© 2024 ReachPersona.com. All rights reserved.').click();
   await page.getByTestId('stSidebarContent').click();
@@ -93,7 +95,7 @@ test('checking for the reachpersona logo and the navbar collapse and expand func
 
 
 test('checking for dropdown works for already existing campaigns', async ({ page }) => {
-  await page.goto(URL);
+  await page.goto(traQRURL);
   await page.getByRole('link', { name: 'Create Campaign' }).click();
   await page.locator('summary').click();
   await page.getByTestId('stExpanderDetails').getByTestId('stFullScreenFrame').click();
@@ -106,7 +108,7 @@ test('uploading csv file with all mandatory fields', async ({ page }) => {
   const expectedAPIResponseMsg = "Data fetched from API successfully!";
   const expectedDownloadBtnText = "Download CSV and QR Codes";
 
-  await page.goto(URL);
+  await page.goto(traQRURL);
   await page.getByRole('link', { name: 'Upload Contacts' }).click();
 
   // selects given campaign_name from dropdown
@@ -217,6 +219,9 @@ test('uploading csv file with all mandatory fields', async ({ page }) => {
   } else {
     console.log('The file is not a ZIP archive. Processing as CSV...');
   }
+
+  Path = new URL(trackableUrl).pathname.substring(1);
+
 })
 
 const mandatoryFields = [
@@ -234,7 +239,7 @@ test(`uploading csv file without mandatory field: ${field}`, async ({ page }) =>
   const expectedCSVUploadMsg = "CSV uploaded successfully!";
   const expectedAPIResponseMsg = `'${field}' is not in list`;
 
-  await page.goto(URL);
+  await page.goto(traQRURL);
 
   await page.getByRole('link', { name: 'Upload Contacts' }).click();
 
@@ -281,7 +286,7 @@ test(`uploading csv file without mandatory field: ${field}`, async ({ page }) =>
 // Checking campaign dashboard for no resonse campaigns
 test('checking campaign which has no response', async ({page}) => {
   const expectedMsg = "No responses to this campaign yet"
-  await page.goto(URL);
+  await page.goto(traQRURL);
   await page.getByRole('link', { name: 'Campaign Dashboard' }).click();
   await page.frameLocator('iframe[title="st_aggrid\\.agGrid"]').getByRole('gridcell', { name: campaign_name }).click();
  
@@ -301,6 +306,8 @@ test('checking campaign which has no response', async ({page}) => {
   });
   expect(responseMsg).toBe(expectedMsg)
 
+  await page.getByTestId('stNotification').click();
+
   // Checking if Campaign Details and Responded Details are visible when any campaign is selected
   const expectedCampaignDetailsHeader = "Campaign Details"
   const CampaignDetailsHeader = await page.locator('span.st-emotion-cache-10trblm.e1nzilvr1').nth(2).textContent();
@@ -316,13 +323,13 @@ test('checking for campaign dashboard with responses', async ({ page }) => {
   await page.goto(trackableUrl);
   await page.waitForLoadState('load'); 
 
-  await page.goto(URL);
+  await page.goto(traQRURL);
   await page.getByRole('link', { name: 'Campaign Dashboard' }).click();
   await page.frameLocator('iframe[title="st_aggrid\\.agGrid"]').getByRole('gridcell', { name: campaign_name }).click();
 
-  await page.frameLocator('iframe[title="st_aggrid\\.agGrid"] >> nth=1').getByRole('gridcell', { name: 'Abhishek' }).click();
+  await page.frameLocator('iframe[title="st_aggrid\\.agGrid"] >> nth=1').getByRole('gridcell', { name: Path }).click();
 
-  await page.frameLocator('iframe[title="st_aggrid\\.agGrid"] >> nth=2').getByRole('gridcell', { name: campaign_name}).first().click();
+  await page.frameLocator('iframe[title="st_aggrid\\.agGrid"] >> nth=2').getByRole('gridcell', { name: Path}).first().click();
   
   // Checking if Campaign Details and Responded Details are visible when any campaign is selected
   const expectedCampaignDetailsHeader = "Contact Details"
@@ -361,8 +368,7 @@ test('checking for campaign dashboard with responses', async ({ page }) => {
     });
   });
   
-  console.log("data ",data);
-  const expectedKeys = ['campaign', 'destination_url', 'contacts', 'timestamp'];
+  const expectedKeys = ['campaign', 'destination_url', 'contacts', 'timestamp','qrcode-id','user-agent','contact.Owner First Name.S','qrcode-id'];
 
   const validValueCheck = (value) => {
     return value && value.trim() !== '';
@@ -376,8 +382,13 @@ test('checking for campaign dashboard with responses', async ({ page }) => {
         const correspondingValue = row[i + 1];
         if (correspondingValue !== undefined) {
           const isValid = validValueCheck(correspondingValue);
-          // console.log(`Checking key: ${key}, value: ${correspondingValue}, isValid: ${isValid}`);
+          console.log(`Checking key: ${key}, value: ${correspondingValue}, isValid: ${isValid}`);
           expect(isValid).toBe(true);
+          if(key == 'qrcode-id'){
+            expect(Path).toBe(correspondingValue)
+            console.log("Path ",Path)
+            console.log("correspondingValue ",correspondingValue)
+          }
         } else {
           console.log(`Value for key: ${key} is undefined`);
           expect(correspondingValue).toBeDefined();
