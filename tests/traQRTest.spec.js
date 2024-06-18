@@ -7,7 +7,9 @@ import csv from 'csv-parser';
 
 const traQRURL = 'https://traqr-demo.weberon.org/?s=4RHQ'
 const userID = '4RHQ'
-const campaign_name = 'test-campaign-01'
+const campaign_name = process.env.TEST_CAMPAIGN
+console.log("campaign_name ",campaign_name)
+console.log("process.env.TEST_CAMPAIGN ",process.env.TEST_CAMPAIGN)
 
 const downloadDirectory = path.join(__dirname, '../downloads');
 let trackableUrl =""
@@ -48,7 +50,7 @@ test('submmiting the form for unique campaign name', async ({page}) => {
   await page.getByLabel('Enter the name for the campaign').fill(campaign_name);
   await page.getByLabel('Enter the name for the campaign').press('Enter');
   await page.getByLabel('Enter the URL value to redirect the user to').click();
-  await page.getByLabel('Enter the URL value to redirect the user to').fill('https://www.reachpersona.com');
+  await page.getByLabel('Enter the URL value to redirect the user to').fill('https://www.reachpersona.com/');
   await page.getByLabel('Enter the URL value to redirect the user to').press('Enter');
   await page.getByTestId('baseButton-secondary').click();
 
@@ -221,7 +223,7 @@ test('uploading csv file with all mandatory fields', async ({ page }) => {
   }
 
   Path = new URL(trackableUrl).pathname.substring(1);
-
+console.log("trackableUrl after Path ",trackableUrl)
 })
 
 const mandatoryFields = [
@@ -320,6 +322,7 @@ test('checking campaign which has no response', async ({page}) => {
 
 
 test('checking for campaign dashboard with responses', async ({ page }) => {
+  console.log("trackableUrl",trackableUrl)
   await page.goto(trackableUrl);
   await page.waitForLoadState('load'); 
 
