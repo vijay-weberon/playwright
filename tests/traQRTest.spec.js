@@ -108,7 +108,7 @@ test('checking for dropdown works for already existing campaigns', async ({ page
 test('uploading csv file with all mandatory fields', async ({ page }) => {
   console.log("Running test - uploading csv file with all mandatory fields")
  
-  const filePathForMandatoryFields = process.env.FILE_PATH_FOR_MANDATORY_FIELDS || "/vijay/playwright/Assests/nskope_records_with_all_mandatory_fields.csv";
+  const filePath = process.env.FILE_PATH_FOR_MANDATORY_FIELDS || "/vijay/playwright/Assests/nskope_records_with_all_mandatory_fields.csv";
   const expectedCSVUploadMsg = "CSV uploaded successfully!";
   const expectedAPIResponseMsg = "Data fetched from API successfully!";
   const expectedDownloadBtnText = "Download CSV and QR Codes";
