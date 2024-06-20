@@ -7,7 +7,7 @@ import csv from 'csv-parser';
 
 const traQRURL = 'https://traqr-demo.weberon.org/?s=4RHQ'
 const userID = '4RHQ'
-const campaign_name = process.env.TEST_CAMPAIGN
+const campaign_name = process.env.TEST_CAMPAIGN || "test-campaign-18"
 console.log("campaign_name ",campaign_name)
 console.log("process.env.TEST_CAMPAIGN ",process.env.TEST_CAMPAIGN)
 
@@ -108,7 +108,7 @@ test('checking for dropdown works for already existing campaigns', async ({ page
 test('uploading csv file with all mandatory fields', async ({ page }) => {
   console.log("Running test - uploading csv file with all mandatory fields")
  
-  const filePathForMandatoryFields = process.env.FILE_PATH_FOR_MANDATORY_FIELDS || "/vijay/playwright/Assests/nskope_records_with_all_mandatory_fields.csv";
+  const filePath = process.env.FILE_PATH_FOR_MANDATORY_FIELDS || "/vijay/playwright/Assests/nskope_records_with_all_mandatory_fields.csv";
   const expectedCSVUploadMsg = "CSV uploaded successfully!";
   const expectedAPIResponseMsg = "Data fetched from API successfully!";
   const expectedDownloadBtnText = "Download CSV and QR Codes";
@@ -290,6 +290,7 @@ test(`uploading csv file without mandatory field: ${field}`, async ({ page }) =>
 
 // Checking campaign dashboard for no resonse campaigns
 test('checking campaign which has no response', async ({page}) => {
+
   const expectedMsg = "No responses to this campaign yet"
   await page.goto(traQRURL);
   await page.getByRole('link', { name: 'Campaign Dashboard' }).click();
@@ -325,6 +326,34 @@ test('checking campaign which has no response', async ({page}) => {
 
 
 test('checking for campaign dashboard with responses', async ({ page }) => {
+ let trackableUrl
+  const extractedFiles = fs.readdirSync(extractedPath);
+  for (const file of extractedFiles) {
+    const extractedFilePath = path.join(extractedPath, file);
+    if (path.extname(file) === '.csv' && file === 'processed_contacts.csv') {
+      // Read and process the CSV file
+      const csvContent = fs.readFileSync(extractedFilePath, 'utf8');
+    //  console.log('CSV File Content:', csvContent);
+
+      // Extract the first row value of the column 'o.rp.trackableurl'
+      trackableUrl = await new Promise((resolve, reject) => {
+        const results = [];
+        fs.createReadStream(extractedFilePath)
+          .pipe(csv())
+          .on('data', (data) => results.push(data))
+          .on('end', () => {
+            if (results.length > 0 && results[0]['o.rp.trackableurl']) {
+              resolve(results[0]['o.rp.trackableurl']);
+            } else {
+              reject(new Error('Column or data not found'));
+            }
+          });
+      });
+      console.log('Value of o.rp.trackableurl:', trackableUrl);
+    }
+  }
+
+
   console.log("trackableUrl",trackableUrl)
   await page.goto(trackableUrl);
   await page.waitForLoadState('load'); 
