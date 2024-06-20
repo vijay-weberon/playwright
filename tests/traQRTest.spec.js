@@ -327,6 +327,7 @@ test('checking campaign which has no response', async ({page}) => {
 
 test('checking for campaign dashboard with responses', async ({ page }) => {
  let trackableUrl
+ const extractedPath = path.join(downloadDirectory, 'extracted');
   const extractedFiles = fs.readdirSync(extractedPath);
   for (const file of extractedFiles) {
     const extractedFilePath = path.join(extractedPath, file);
