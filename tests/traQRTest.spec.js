@@ -4,9 +4,10 @@ import fs from 'fs';
 import unzipper from 'unzipper';
 import csv from 'csv-parser'; 
 
+const userID = process.env.userID 
+const traQRWebsiteURL = process.env.TRAQR_URL || "https://developer16-traqr.reachpersona.com/"
+const traQRURL = `${traQRWebsiteURL}?s=${userID}`
 
-const traQRURL = 'https://traqr-demo.weberon.org/?s=4RHQ'
-const userID = '4RHQ'
 const campaign_name = process.env.TEST_CAMPAIGN || "test-campaign-18"
 console.log("campaign_name ",campaign_name)
 console.log("process.env.TEST_CAMPAIGN ",process.env.TEST_CAMPAIGN)
@@ -21,24 +22,24 @@ test('checking for navlist items', async ({page}) => {
   
   // Click the link and wait for the URL to be the expected one
   await page.getByRole('link', { name: 'Create Campaign' }).click();
-  await page.waitForURL(`https://traqr-demo.weberon.org/create_campaign?s=${userID}`);
+  await page.waitForURL(`${traQRWebsiteURL}create_campaign?s=${userID}`);
   const createCampaignURL  = await page.url()
-  console.log("expected createCampaignURL - ",`https://traqr-demo.weberon.org/create_campaign?s=${userID}`)
+  console.log("expected createCampaignURL - ",`${traQRWebsiteURL}create_campaign?s=${userID}`)
   console.log("result createCampaignURL - ",createCampaignURL)
-  expect(createCampaignURL).toBe(`https://traqr-demo.weberon.org/create_campaign?s=${userID}`);
+  expect(createCampaignURL).toBe(`${traQRWebsiteURL}create_campaign?s=${userID}`);
   
   await page.getByRole('link', { name: 'Upload Contacts' }).click();
-  await page.waitForURL(`https://traqr-demo.weberon.org/upload_records_in_bulk?s=${userID}`);
+  await page.waitForURL(`${traQRWebsiteURL}upload_records_in_bulk?s=${userID}`);
   const uploadContactsURL  = await page.url()
-  expect(uploadContactsURL).toBe(`https://traqr-demo.weberon.org/upload_records_in_bulk?s=${userID}`);
-  console.log("expected uploadContactsURL - ",`https://traqr-demo.weberon.org/upload_records_in_bulk?s=${userID}`)
+  expect(uploadContactsURL).toBe(`${traQRWebsiteURL}upload_records_in_bulk?s=${userID}`);
+  console.log("expected uploadContactsURL - ",`${traQRWebsiteURL}upload_records_in_bulk?s=${userID}`)
   console.log("result uploadContactsURL - ",uploadContactsURL)
 
   await page.getByRole('link', { name: 'Campaign Dashboard' }).click();
-  await page.waitForURL(`https://traqr-demo.weberon.org/see_statistics_for_short_url?s=${userID}`);
+  await page.waitForURL(`${traQRWebsiteURL}see_statistics_for_short_url?s=${userID}`);
   const campaignDashboardURL  = await page.url()
-  expect(campaignDashboardURL).toBe(`https://traqr-demo.weberon.org/see_statistics_for_short_url?s=${userID}`);
-  console.log("expected campaignDashboardURL - ",`https://traqr-demo.weberon.org/see_statistics_for_short_url?s=${userID}`)
+  expect(campaignDashboardURL).toBe(`${traQRWebsiteURL}see_statistics_for_short_url?s=${userID}`);
+  console.log("expected campaignDashboardURL - ",`${traQRWebsiteURL}see_statistics_for_short_url?s=${userID}`)
   console.log("result campaignDashboardURL - ",campaignDashboardURL)
 });
 
@@ -71,7 +72,7 @@ test('submmiting the form for duplicate campaign name', async ({page}) => {
   await page.getByLabel('Enter the name for the campaign').fill(campaign_name);
   await page.getByLabel('Enter the name for the campaign').press('Enter');
   await page.getByLabel('Enter the URL value to redirect the user to').click();
-  await page.getByLabel('Enter the URL value to redirect the user to').fill('https://www.reachpersona.com');
+  await page.getByLabel('Enter the URL value to redirect the user to').fill('https://www.reachpersona.com/');
   await page.getByLabel('Enter the URL value to redirect the user to').press('Enter');
   await page.getByTestId('baseButton-secondary').click();
 
