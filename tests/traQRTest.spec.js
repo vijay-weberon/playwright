@@ -4,11 +4,11 @@ import fs from 'fs';
 import unzipper from 'unzipper';
 import csv from 'csv-parser'; 
 
-const userID = process.env.userID 
+const userID = process.env.userID || "74b29aec-d413-49ab-b797-cf8e34e79a14"
 const traQRWebsiteURL = process.env.TRAQR_URL || "https://developer16-traqr.reachpersona.com/"
 const traQRURL = `${traQRWebsiteURL}?s=${userID}`
 
-const campaign_name = process.env.TEST_CAMPAIGN || "test-campaign-18"
+const campaign_name = process.env.TEST_CAMPAIGN || "test-campaign-01"
 console.log("campaign_name ",campaign_name)
 console.log("process.env.TEST_CAMPAIGN ",process.env.TEST_CAMPAIGN)
 
@@ -16,6 +16,7 @@ const downloadDirectory = path.join(__dirname, '../downloads');
 let trackableUrl =""
 let Path = ""
 
+console.log("traQRURL ",traQRURL)
 
 test('checking for navlist items', async ({page}) => {
   await page.goto(traQRURL);
@@ -56,12 +57,14 @@ test('submmiting the form for unique campaign name', async ({page}) => {
   await page.getByTestId('baseButton-secondary').click();
 
  // Wait for the message element to appear
- const message = await page.waitForSelector('.e1eexb540');
-  
- // Get the text content of the message element
- const messageText = await message.textContent();
- expect(messageText).toBe(`A campaign for ${campaign_name} was created successfully`)
- console.log("messageText ",messageText)
+ 
+ await page.waitForSelector(`text=A campaign for ${campaign_name} was created successfully`, { timeout: 5000 });
+
+// const message = await page.waitForSelector('.e1eexb540');
+//  // Get the text content of the message element
+//  const messageText = await message.textContent();
+//  expect(messageText).toBe(`A campaign for ${campaign_name} was created successfully`)
+//  console.log("messageText ",messageText)
 })
 
 
@@ -77,11 +80,10 @@ test('submmiting the form for duplicate campaign name', async ({page}) => {
   await page.getByTestId('baseButton-secondary').click();
 
  // Wait for the message element to appear
- const message = await page.waitForSelector('.e1eexb540');
+//  const message = await page.waitForSelector('.e1eexb540');
   
  // Get the text content of the message element
- const messageText = await message.textContent();
- expect(messageText).toBe(`A campaign under ${campaign_name} already exists for this user`)
+ await page.waitForSelector(`text=A campaign under ${campaign_name} already exists for this user`, { timeout: 5000 });
 })
 
 
@@ -241,7 +243,10 @@ const mandatoryFields = [
 mandatoryFields.forEach((field) => {
 test(`uploading csv file without mandatory field: ${field}`, async ({ page }) => {
  
+  // This path is for the Jenkins Job
   const filePath = `${process.env.FILE_PATH_FOR_WITHOUT_MANDATORY_FIELDS}/nskope_records_without_${field}.csv` || `/vijay/playwright/Assests/nskope_records_without_${field}.csv`;
+  // To locally run specifiy the local path of those files
+  // const filePath =  `/vijay/playwright/Assests/nskope_records_without_${field}.csv`;
   const expectedCSVUploadMsg = "CSV uploaded successfully!";
   const expectedAPIResponseMsg = `'${field}' is not in list`;
 
@@ -253,7 +258,7 @@ test(`uploading csv file without mandatory field: ${field}`, async ({ page }) =>
   await page.getByLabel('Select a').fill(campaign_name);
   await page.getByRole('option', { name: campaign_name }).click();
 
-
+console.log("filePath",filePath)
   await page.locator('[data-testid="stFileUploaderDropzoneInput"]').setInputFiles(filePath);
 
 // Wait for all the messages appears on screen
@@ -359,7 +364,8 @@ test('checking for campaign dashboard with responses', async ({ page }) => {
   console.log("trackableUrl",trackableUrl)
   await page.goto(trackableUrl);
   await page.waitForLoadState('load'); 
-
+  Path = new URL(trackableUrl).pathname.substring(1);
+  console.log("Path ",Path)
   await page.goto(traQRURL);
   await page.getByRole('link', { name: 'Campaign Dashboard' }).click();
   await page.frameLocator('iframe[title="st_aggrid\\.agGrid"]').getByRole('gridcell', { name: campaign_name }).click();
