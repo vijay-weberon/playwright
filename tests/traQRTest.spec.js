@@ -3,12 +3,13 @@ import path from 'path';
 import fs from 'fs';
 import unzipper from 'unzipper';
 import csv from 'csv-parser'; 
+const { chromium } = require('playwright');
 
 const userID = process.env.userID || "74b29aec-d413-49ab-b797-cf8e34e79a14"
 const traQRWebsiteURL = process.env.TRAQR_URL || "https://developer16-traqr.reachpersona.com/"
 const traQRURL = `${traQRWebsiteURL}?s=${userID}`
 
-const campaign_name = process.env.TEST_CAMPAIGN || "test-campaign-01"
+let campaign_name = process.env.TEST_CAMPAIGN || "test-campaign-01"
 console.log("campaign_name ",campaign_name)
 console.log("process.env.TEST_CAMPAIGN ",process.env.TEST_CAMPAIGN)
 
@@ -55,16 +56,9 @@ test('submmiting the form for unique campaign name', async ({page}) => {
   await page.getByLabel('Enter the URL value to redirect the user to').fill('https://www.reachpersona.com/');
   await page.getByLabel('Enter the URL value to redirect the user to').press('Enter');
   await page.getByTestId('baseButton-secondary').click();
-
- // Wait for the message element to appear
  
  await page.waitForSelector(`text=A campaign for ${campaign_name} was created successfully`, { timeout: 5000 });
 
-// const message = await page.waitForSelector('.e1eexb540');
-//  // Get the text content of the message element
-//  const messageText = await message.textContent();
-//  expect(messageText).toBe(`A campaign for ${campaign_name} was created successfully`)
-//  console.log("messageText ",messageText)
 })
 
 
@@ -79,10 +73,6 @@ test('submmiting the form for duplicate campaign name', async ({page}) => {
   await page.getByLabel('Enter the URL value to redirect the user to').press('Enter');
   await page.getByTestId('baseButton-secondary').click();
 
- // Wait for the message element to appear
-//  const message = await page.waitForSelector('.e1eexb540');
-  
- // Get the text content of the message element
  await page.waitForSelector(`text=A campaign under ${campaign_name} already exists for this user`, { timeout: 5000 });
 })
 
@@ -296,27 +286,9 @@ console.log("filePath",filePath)
 
 // Checking campaign dashboard for no resonse campaigns
 test('checking campaign which has no response', async ({page}) => {
-
-  const expectedMsg = "No responses to this campaign yet"
   await page.goto(traQRURL);
   await page.getByRole('link', { name: 'Campaign Dashboard' }).click();
-  await page.frameLocator('iframe[title="st_aggrid\\.agGrid"]').getByRole('gridcell', { name: campaign_name }).click();
- 
-  await page.waitForFunction(() => {
-    const containers = document.querySelectorAll('div[data-testid="stMarkdownContainer"]');
-    return containers.length >= 16;
-  }, { timeout: 30000 });
-
-  const responseMsg = await page.evaluate(() => {
-    const containers = document.querySelectorAll('[data-testid="stMarkdownContainer"]');
-    console.log("containers.length ",containers.length)
-    if (containers.length >= 16) {
-      const pTag = containers[15].querySelector('p');
-      return pTag ? pTag.textContent : null;
-    }
-    return null;
-  });
-  expect(responseMsg).toBe(expectedMsg)
+  await page.frameLocator('iframe[title="st_aggrid\\.agGrid"]').getByRole('gridcell', { name: campaign_name, exact: true  }).click();
 
   await page.getByTestId('stNotification').click();
 
@@ -328,6 +300,10 @@ test('checking campaign which has no response', async ({page}) => {
   const expectedRespondedContactsHeader = "Responded Contacts"
   const RespondedContactsHeader = await page.locator('span.st-emotion-cache-10trblm.e1nzilvr1').nth(3).textContent();
   expect(RespondedContactsHeader).toBe(expectedRespondedContactsHeader)
+
+  // Checking for "No responses to this campaign yet" message
+  await page.waitForSelector(`text=No responses to this campaign yet`, { timeout: 5000 });
+
 })
 
 
@@ -441,3 +417,32 @@ test('checking for campaign dashboard with responses', async ({ page }) => {
   });
     console.log("All the checks have passed")
 });
+
+
+test('checking for network traffic', async ({}) => {
+  // Launch the browser
+  const browser = await chromium.launch();
+
+  // Create a new browser context with network emulation enabled
+  const context = await browser.newContext({
+    recordHar: { path: 'request_waterfall.har' } // Specify the path where the HAR file will be saved
+  });
+
+ // Create a page within the context
+  const page = await context.newPage();
+
+  console.log(trackableUrl)
+  // Navigate to the URL
+  await page.goto(trackableUrl);
+
+  // Wait for the page to load completely
+  await page.waitForLoadState('networkidle');
+
+  await page.waitForTimeout(5000)
+  // Close the page and context
+  await page.close();
+  await context.close();
+
+  // Close the browser
+  await browser.close();
+})
